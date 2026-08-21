@@ -43,6 +43,19 @@
 </head>
 <body>
     <p class="content">Hi, this is the personal website of Colin Maier, co-founder of <a href="https://www.ranchpressing.net" target="_blank" rel="noopener">Ranch Pressing</a>, founder of <a href="http://www.smallbusine.ss" target="_blank" rel="noopener">Small Business</a> and <a href="https://www.instagram.com/cckckkmkmm" target="_blank" rel="noopener">half-serious photographer</a>.</p>
-    <img src="https://raw.githubusercontent.com/sarariman0/colinmaier/refs/heads/main/photo.webp">
+    <img id="randomPhoto" alt="">
+
+    <script>
+        // Add the filename of every photo in your /photos folder here.
+        const photos = [
+            "photo1.webp",
+            "photo2.webp",
+            "photo3.webp"
+        ];
+
+        const base = "https://raw.githubusercontent.com/sarariman0/colinmaier/refs/heads/main/photos/";
+        const chosen = photos[Math.floor(Math.random() * photos.length)];
+        document.getElementById("randomPhoto").src = base + chosen;
+    </script>
 </body>
 </html>
