@@ -56,33 +56,38 @@
             object-position: left top;
         }
 
-        /* Mobile Responsive Layout (Screens 768px wide and below) */
+        /* Mobile Responsive Layout (Screens 768px wide or smaller) */
         @media (max-width: 768px) {
-            body {
-                display: block;
+            html, body {
                 height: auto;
                 overflow-y: auto;
+            }
+            body {
+                display: block;
             }
             .wrap {
                 flex-direction: column;
                 height: auto;
                 width: 100%;
-                margin-top: 2vh;
-                padding: 0 1px; /* 1px margin on left and right edges */
+                margin-top: 5vh;
             }
             .content {
-                margin: 0 0 15px 0; /* Space between text and photo stacked below */
-                width: 100%;
+                /* Spans left-to-right with a 1px margin on both sides */
+                margin: 0 1px 1px 1px;
+                width: calc(100% - 2px);
             }
             .photo-container {
                 flex: none;
                 width: 100%;
                 height: auto;
+                /* 1px spacing at the top of the photo separating it from the text */
+                margin-top: 1px; 
                 justify-content: center;
             }
             img {
                 width: 100%;
-                max-height: 70vh; /* Keeps mobile photo from taking up too much vertical space */
+                height: auto;
+                max-height: none;
                 object-position: center top;
             }
         }
