@@ -11,7 +11,7 @@
             width: 100%;
             margin: 0;
             background: #fff;
-            overflow: hidden;
+            /* Removed overflow: hidden to enable pull-to-refresh */
         }
         body {
             display: flex;
@@ -22,7 +22,7 @@
             display: flex;
             flex-direction: row;
             align-items: flex-start;
-            height: 80vh; /* Remaining height after the 20vh top offset */
+            height: 95vh; /* Adjusted height to account for the 5vh top margin */
             width: 100vw;
             margin-top: 5vh; /* Pushes both text and photo down together from the top */
             padding: 0;
@@ -34,6 +34,54 @@
             color: #000;
             white-space: pre-wrap;
             margin: 0 1px 0 1px; /* 1px from screen left, 1px gap to photo */
+            flex: 1;
+            min-width: 0;
+            text-align: left;
+        }
+        .photo-container {
+            flex: 0 0 66.666%; /* Locks photo area to 2/3rds of the screen */
+            height: 100%;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+        a {
+            color: #000;
+            text-decoration: underline;
+        }
+        img {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            object-position: left top;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <p class="content">Hi, this is the personal website of Colin Maier, co-founder of <a href="https://www.ranchpressing.net" target="_blank" rel="noopener">Ranch Pressing</a>, founder of <a href="http://www.smallbusine.ss" target="_blank" rel="noopener">Small Business</a> and <a href="https://www.instagram.com/cckckkmkmm" target="_blank" rel="noopener">half-serious photographer</a>.</p>
+        <div class="photo-container">
+            <img id="randomPhoto" alt="">
+        </div>
+    </div>
+
+    <script>
+        // Add the filename of every photo in your /photos folder here.
+        const photos = [
+            "dotslinesshapesspaces.webp",
+            "wateringgarden.jpg",
+            "alohaapco.jpg",
+            "macbethquestionmark.jpg",
+            "doginwindow.jpg"
+        ];
+
+        const base = "https://raw.githubusercontent.com/sarariman0/colinmaier/refs/heads/main/photos/";
+        const chosen = photos[Math.floor(Math.random() * photos.length)];
+        document.getElementById("randomPhoto").src = base + chosen;
+    </script>
+</body>
+</html>
             flex: 1;
             min-width: 0;
             text-align: left;
