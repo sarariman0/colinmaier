@@ -16,14 +16,15 @@
         body {
             display: flex;
             justify-content: flex-end;
-            align-items: center;
+            align-items: flex-start;
         }
         .wrap {
             display: flex;
             flex-direction: row;
             align-items: flex-start;
-            height: 100vh;
+            height: 80vh; /* Remaining height after the 20vh top offset */
             width: 100vw;
+            margin-top: 20vh; /* Pushes both text and photo down together from the top */
             padding: 0;
         }
         .content {
@@ -32,8 +33,7 @@
             line-height: 1.3;
             color: #000;
             white-space: pre-wrap;
-            /* 20vh top, 1px right (gap to photo), 0 bottom, 1px left (gap to screen edge) */
-            margin: 20vh 1px 0 1px;
+            margin: 0 1px 0 1px; /* 1px from screen left, 1px gap to photo */
             flex: 1;
             min-width: 0;
             text-align: left;
@@ -54,7 +54,7 @@
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            object-position: left top; /* Anchors the photo to the left of its container, directly touching the 1px text boundary */
+            object-position: left top;
         }
     </style>
 </head>
