@@ -24,17 +24,19 @@
             align-items: flex-start;
             height: 100vh;
             width: 100vw;
-            padding: 0; /* Removed padding so it sits flush with the edges */
+            padding: 0;
         }
         .content {
             font-family: "Courier New", Courier, monospace;
-            font-size: 20px;
+            font-size: 14px;
             line-height: 1.3;
             color: #000;
             white-space: pre-wrap;
-            margin: 20vh 1px 0 0; /* Reduced to 1px so the text hugs the photo's left edge tightly */
+            margin: 20vh 0 0 0; /* Zero margin so it starts flush and hits the photo edge */
             flex: 1;
             min-width: 0;
+            text-align: justify;       /* Justifies the text block */
+            text-align-last: justify;   /* Ensures the final line also stretches to hug the photo */
         }
         .photo-container {
             flex: 0 0 66.666%; /* Locks container to 2/3rds of the screen */
@@ -68,10 +70,10 @@
         // Add the filename of every photo in your /photos folder here.
         const photos = [
             "dotslinesshapesspaces.webp",
+            "wateringgarden.jpg",
+            "alohaapco.jpg",
             "macbethquestionmark.jpg",
-            "dogsinwindow.jpg",
-            "stripestriangles.webp",
-            "nicepark.webp"
+            "doginwindow.jpg"
         ];
 
         const base = "https://raw.githubusercontent.com/sarariman0/colinmaier/refs/heads/main/photos/";
