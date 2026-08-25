@@ -77,8 +77,16 @@
           vertical scrolling — so scaling effectively caps out once the
           screen is too small (in height) for the width-scaled version to
           fit.
+
+          (hover: hover) and (pointer: fine) restricts this to devices
+          with a mouse/trackpad — i.e. actual desktops/laptops — rather
+          than any screen over 420px wide. Without this, a phone in
+          landscape (width > 420px but a touchscreen) would get treated
+          as "desktop", scaled up, then immediately shrunk back down hard
+          to avoid overflow, making the text tiny. Touch devices are left
+          at their natural 1:1 mobile layout regardless of orientation.
         */
-        @media (min-width: 421px) {
+        @media (min-width: 421px) and (hover: hover) and (pointer: fine) {
             html {
                 zoom: calc(100vw / 420);
             }
@@ -130,11 +138,22 @@
                 document.documentElement.style.zoom = z;
             }
 
+            // Matches the CSS media query above: only treat this as a
+            // "desktop" that should scale up if it's a fine-pointer,
+            // hover-capable device. A phone in landscape is still a
+            // touchscreen, so it's excluded and kept at its natural
+            // mobile layout instead of being scaled up and then
+            // aggressively shrunk back down.
+            function isDesktopLike() {
+                return window.matchMedia &&
+                    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+            }
+
             // Starts from the same width-based zoom as before, then shrinks
             // it further (never below what's needed to fill the width) so
             // the fully scaled content never exceeds the viewport height.
             function fitZoom() {
-                if (window.innerWidth <= DESIGN_WIDTH) {
+                if (window.innerWidth <= DESIGN_WIDTH || !isDesktopLike()) {
                     setZoom(1);
                     return;
                 }
