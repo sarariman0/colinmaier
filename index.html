@@ -70,8 +70,13 @@
           spacing) up proportionally instead of switching to a different
           layout — desktop just looks like a bigger version of mobile.
 
-          Adjust the 420px number below if your mobile layout was actually
-          designed around a different width (e.g. iPhone is ~390-430px).
+          This CSS rule sets an initial width-based zoom immediately (so
+          there's no flash of tiny unscaled text/photo before JS runs).
+          The script below then measures the actual rendered height and
+          dials the zoom back down if a fully scaled photo would require
+          vertical scrolling — so scaling effectively caps out once the
+          screen is too small (in height) for the width-scaled version to
+          fit.
         */
         @media (min-width: 421px) {
             html {
@@ -89,34 +94,79 @@
     </div>
 
     <script>
-        // Add the filename of every photo in your /photos folder here.
-        const photos = [
-            "dotslinesshapesspaces.webp",
-            "nicepark.webp",
-            "macbethquestionmark.jpg",
-            "dogsinwindow.jpg",
-            "53windsreno.webp",
-            "Loungesuites.webp",
-            "Youyangs.webp",
-            "acdp.webp",
-            "broughamst.webp",
-            "brooklynfleamarket.webp",
-            "burlingtoncoatfactory.webp",
-            "easternpark.webp",
-            "geelongcarpark.webp",
-            "geelongwest.webp",
-            "murraybigtree.webp",
-            "tullamarinerainbow.webp",
-            "whittingtonrose.webp",
-            "whitesbeach.webp",
-            "whittingtonwaterpark.webp",
-            "woomelang.webp",
-            "villagecinemaglenorchy.webp"  
-        ];
+        (function () {
+            // Add the filename of every photo in your /photos folder here.
+            const photos = [
+                "dotslinesshapesspaces.webp",
+                "nicepark.webp",
+                "macbethquestionmark.jpg",
+                "dogsinwindow.jpg",
+                "53windsreno.webp",
+                "Loungesuites.webp",
+                "Youyangs.webp",
+                "acdp.webp",
+                "broughamst.webp",
+                "brooklynfleamarket.webp",
+                "burlingtoncoatfactory.webp",
+                "easternpark.webp",
+                "geelongcarpark.webp",
+                "geelongwest.webp",
+                "murraybigtree.webp",
+                "tullamarinerainbow.webp",
+                "whittingtonrose.webp",
+                "whitesbeach.webp",
+                "whittingtonwaterpark.webp",
+                "woomelang.webp",
+                "villagecinemaglenorchy.webp"
+            ];
 
-        const base = "https://raw.githubusercontent.com/sarariman0/colinmaier/refs/heads/main/photos/";
-        const chosen = photos[Math.floor(Math.random() * photos.length)];
-        document.getElementById("randomPhoto").src = base + chosen;
+            const base = "https://raw.githubusercontent.com/sarariman0/colinmaier/refs/heads/main/photos/";
+            const chosen = photos[Math.floor(Math.random() * photos.length)];
+            const imgEl = document.getElementById("randomPhoto");
+            const wrap = document.querySelector(".wrap");
+            const DESIGN_WIDTH = 420;
+
+            function setZoom(z) {
+                document.documentElement.style.zoom = z;
+            }
+
+            // Starts from the same width-based zoom as before, then shrinks
+            // it further (never below what's needed to fill the width) so
+            // the fully scaled content never exceeds the viewport height.
+            function fitZoom() {
+                if (window.innerWidth <= DESIGN_WIDTH) {
+                    setZoom(1);
+                    return;
+                }
+
+                let zoom = window.innerWidth / DESIGN_WIDTH;
+                setZoom(zoom);
+
+                // A few passes to converge, since vh-based spacing doesn't
+                // scale perfectly linearly with zoom.
+                for (let i = 0; i < 3; i++) {
+                    const contentHeight = wrap.getBoundingClientRect().height;
+                    if (contentHeight <= window.innerHeight + 1) break;
+                    zoom = zoom * (window.innerHeight / contentHeight);
+                    setZoom(zoom);
+                }
+            }
+
+            let resizeTimer;
+            window.addEventListener("resize", function () {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(fitZoom, 100);
+            });
+
+            // Re-fit once the photo has actually loaded (its natural
+            // aspect ratio determines its height at any given width).
+            imgEl.addEventListener("load", fitZoom);
+            imgEl.src = base + chosen;
+
+            // Run once immediately too, so sizing is reasonable even
+            // before the image finishes loading.
+            fitZoom();
+        })();
     </script>
 </body>
 </html>
