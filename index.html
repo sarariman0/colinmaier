@@ -138,44 +138,59 @@
                 document.documentElement.style.zoom = z;
             }
 
-            // Matches the CSS media query above: only treat this as a
-            // "desktop" that should scale up if it's a fine-pointer,
-            // hover-capable device. A phone in landscape is still a
-            // touchscreen, so it's excluded and kept at its natural
-            // mobile layout instead of being scaled up and then
-            // aggressively shrunk back down.
+            // Matches the CSS media query above: only the initial
+            // scale-UP (to make small text/photos bigger on a big
+            // monitor) is gated to fine-pointer, hover-capable devices.
+            // A phone in landscape — including Chrome's "Desktop site"
+            // mode, which changes the reported viewport width but not
+            // the actual touch hardware — should never get scaled up.
             function isDesktopLike() {
                 return window.matchMedia &&
                     window.matchMedia("(hover: hover) and (pointer: fine)").matches;
             }
 
-            // Starts from the same width-based zoom as before, then shrinks
-            // it further (never below what's needed to fill the width) so
-            // the fully scaled content never exceeds the viewport height.
-            function fitZoom() {
-                if (window.innerWidth <= DESIGN_WIDTH || !isDesktopLike()) {
-                    setZoom(1);
-                    return;
-                }
+            // The visible height actually available (visualViewport is
+            // more reliable than window.innerHeight on mobile, since it
+            // accounts for the browser's address bar showing/hiding).
+            function viewportHeight() {
+                return (window.visualViewport && window.visualViewport.height) ||
+                    window.innerHeight;
+            }
 
-                let zoom = window.innerWidth / DESIGN_WIDTH;
+            // Starts from a width-based zoom on desktop-like devices only
+            // (1:1 everywhere else), then — regardless of device — shrinks
+            // the zoom further if needed so the content never exceeds the
+            // visible height. This is what keeps a phone in landscape
+            // (mobile or "desktop site" mode) from needing a vertical
+            // scroll: it always fits to whatever's actually visible.
+            function fitZoom() {
+                let zoom = 1;
+                if (window.innerWidth > DESIGN_WIDTH && isDesktopLike()) {
+                    zoom = window.innerWidth / DESIGN_WIDTH;
+                }
                 setZoom(zoom);
 
                 // A few passes to converge, since vh-based spacing doesn't
                 // scale perfectly linearly with zoom.
                 for (let i = 0; i < 3; i++) {
                     const contentHeight = wrap.getBoundingClientRect().height;
-                    if (contentHeight <= window.innerHeight + 1) break;
-                    zoom = zoom * (window.innerHeight / contentHeight);
+                    const availableHeight = viewportHeight();
+                    if (contentHeight <= availableHeight + 1) break;
+                    zoom = zoom * (availableHeight / contentHeight);
                     setZoom(zoom);
                 }
             }
 
             let resizeTimer;
-            window.addEventListener("resize", function () {
+            function scheduleRefit() {
                 clearTimeout(resizeTimer);
                 resizeTimer = setTimeout(fitZoom, 100);
-            });
+            }
+            window.addEventListener("resize", scheduleRefit);
+            window.addEventListener("orientationchange", scheduleRefit);
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener("resize", scheduleRefit);
+            }
 
             // Re-fit once the photo has actually loaded (its natural
             // aspect ratio determines its height at any given width).
