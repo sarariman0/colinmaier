@@ -66,12 +66,12 @@
         /*
           ===== Desktop scaling =====
           Reference width = the design width the mobile layout was tuned for.
-          Zoom now scales only .photo-container, not the whole page, so the
-          text stays fixed at 14px and pinned to the top of the window on
-          every screen size — only the photo grows on wider screens.
+          Zoom scales the whole page (text + photo together), so desktop
+          looks like the same proportions as mobile, just bigger — rather
+          than a fixed 14px reading as small on a much bigger screen.
         */
         @media (min-width: 421px) {
-            .photo-container {
+            html {
                 zoom: calc(100vw / 420);
             }
         }
