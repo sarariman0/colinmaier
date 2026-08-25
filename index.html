@@ -27,7 +27,7 @@
             display: flex;
             flex-direction: column;
             width: 100%;
-            margin-top: 5vh;
+            margin-top: 0;
             padding: 0;
         }
         .content {
@@ -66,15 +66,12 @@
         /*
           ===== Desktop scaling =====
           Reference width = the design width the mobile layout was tuned for.
-          Above that width, `zoom` scales the whole page (text + photos +
-          spacing) up proportionally instead of switching to a different
-          layout — desktop just looks like a bigger version of mobile.
-
-          Adjust the 420px number below if your mobile layout was actually
-          designed around a different width (e.g. iPhone is ~390-430px).
+          Zoom now scales only .photo-container, not the whole page, so the
+          text stays fixed at 14px and pinned to the top of the window on
+          every screen size — only the photo grows on wider screens.
         */
         @media (min-width: 421px) {
-            html {
+            .photo-container {
                 zoom: calc(100vw / 420);
             }
         }
