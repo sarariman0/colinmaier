@@ -1,3 +1,5 @@
+Back up
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,49 +13,28 @@
     <link rel="apple-touch-icon" sizes="180x180" href="favicon-180.png">
     <style>
         * { box-sizing: border-box; }
-
         html, body {
-            margin: 0;
-            padding: 0;
+            height: auto;
             width: 100%;
-            /* Lock the page to exactly the visible viewport. dvh (dynamic
-               viewport height) tracks the real visible area on mobile as
-               the browser's address bar shows/hides; vh is the fallback
-               for browsers that don't support dvh yet. */
-            height: 100vh;
-            height: 100dvh;
+            margin: 0;
             background: #fff;
-            /* Deliberately NOT overflow: hidden here — the layout below
-               is sized to fit exactly, so nothing actually scrolls, but
-               leaving default overflow lets mobile browsers still detect
-               the pull-to-refresh gesture. */
+            overflow-y: auto;
+        }
+        body {
+            display: block;
         }
 
-        /*
-          ===== Layout =====
-          A single flex column, exactly as tall as the viewport:
-            - .content is fixed-size and never shrinks below readable size.
-            - .photo-container takes whatever vertical space is left over
-              (flex: 1, min-height: 0) and the <img> inside it uses
-              object-fit: contain, so the photo is always scaled to fit
-              entirely within that space — never cropped, never taller
-              than what's visible, never causing a scrollbar.
-        */
-        .page {
+        /* ===== Base layout (this is now the ONLY layout — same on mobile and desktop) ===== */
+        .wrap {
             display: flex;
             flex-direction: column;
             width: 100%;
-            height: 100%;
-            padding: 2vh 1px 1px 1px;
+            margin-top: 5vh;
+            padding: 0;
         }
-
         .content {
-            flex: 0 0 auto;
             font-family: "Courier New", Courier, monospace;
-            /* Scales up gently on wider screens for readability, but
-               clamp()'s floor guarantees it is never smaller than 14px
-               regardless of viewport size or orientation. */
-            font-size: clamp(14px, 1.4vw, 20px);
+            font-size: 14px;
             line-height: 1.3;
             color: #000;
             white-space: pre-wrap;
@@ -61,33 +42,48 @@
             width: calc(100% - 2px);
             text-align: left;
         }
-
         .photo-container {
-            flex: 1 1 auto;
-            min-height: 0; /* required for flex children to shrink properly */
+            flex: none;
             width: 100%;
+            height: auto;
             margin-top: 1px;
-            overflow: hidden;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
         }
-
         a {
             font-weight: bold;
             text-decoration: none;
         }
-
         img {
             display: block;
             width: 100%;
             height: auto;
-            /* Full width, always — never cropped left/right. If the
-               resulting height is taller than the space left over after
-               the text, .photo-container's overflow: hidden clips the
-               excess off the bottom only. */
+            max-width: 100%;
+            max-height: none;
+            object-fit: contain;
+            object-position: center top;
+        }
+
+        /*
+          ===== Desktop scaling =====
+          Reference width = the design width the mobile layout was tuned for.
+          Above that width, `zoom` scales the whole page (text + photos +
+          spacing) up proportionally instead of switching to a different
+          layout — desktop just looks like a bigger version of mobile.
+
+          Adjust the 420px number below if your mobile layout was actually
+          designed around a different width (e.g. iPhone is ~390-430px).
+        */
+        @media (min-width: 421px) {
+            html {
+                zoom: calc(100vw / 420);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="page">
+    <div class="wrap">
         <p class="content">Hi, this is the personal website of Colin Maier, co-founder of <a href="https://www.ranchpressing.net" target="_blank" rel="noopener">Ranch Pressing</a>, founder of <a href="http://www.smallbusine.ss" target="_blank" rel="noopener">Small Business</a> and <a href="https://www.instagram.com/cckckkmkmm" target="_blank" rel="noopener">half-serious photographer</a>. You can contact me <a href="mailto:colinmaier.au.3itkf@passmail.net">here</a>.</p>
         <div class="photo-container">
             <img id="randomPhoto" alt="">
@@ -117,7 +113,7 @@
             "whitesbeach.webp",
             "whittingtonwaterpark.webp",
             "woomelang.webp",
-            "villagecinemaglenorchy.webp"
+            "villagecinemaglenorchy.webp"  
         ];
 
         const base = "https://raw.githubusercontent.com/sarariman0/colinmaier/refs/heads/main/photos/";
