@@ -104,6 +104,7 @@
             .photo-container img {
                 display: block;
                 object-fit: contain;
+                max-width: none; /* override the mobile max-width: 100%, which creates a circular sizing conflict against a shrink-to-fit float */
                 /* width/height set precisely via JS in pixels, not percentages
                    or transform, so the float's reserved space always matches
                    the photo's actual visible size */
