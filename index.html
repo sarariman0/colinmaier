@@ -39,6 +39,7 @@
             margin: 0 1px 1px 1px;
             width: calc(100% - 2px);
             text-align: left;
+            order: 1;
         }
         .photo-container {
             flex: none;
@@ -48,6 +49,7 @@
             display: flex;
             align-items: flex-start;
             justify-content: center;
+            order: 2;
         }
         a {
             font-weight: bold;
@@ -76,48 +78,41 @@
                 overflow-x: hidden;
                 overflow-y: auto;
             }
+            /* flow-root (rather than the mobile flex layout) so the floated
+               photo and the wrapping text behave like a normal document:
+               text hugs the photo's left edge, then drops to full width
+               once it passes the photo's bottom. */
             .wrap {
-                flex-direction: row;
-                flex-wrap: nowrap;
-                align-items: flex-start;
-                height: 100vh;
+                display: flow-root;
+                /* width set via JS to the golden-ratio total (photo + text) */
             }
             .content {
-                font-size: 18px;
-                flex: none;
+                font-size: 18px; /* fallback; JS shrinks this down to a 14px floor as needed */
                 margin: 0 1px 1px 0;
-                width: 38%; /* fallback before JS sets the exact golden-ratio width */
                 overflow-wrap: break-word;
                 word-break: break-word;
             }
             .photo-container {
-                flex: 1 1 auto;
-                height: 100%;
-                min-width: 0;
+                float: right;
                 margin-top: 0;
                 margin-left: 8px;
-                align-items: flex-start;
-                justify-content: flex-start;
             }
             .photo-container img {
-                width: auto;
-                height: 100%;
-                max-width: 100%;
-                max-height: 100%;
+                display: block;
                 object-fit: contain;
-                object-position: left top;
-                transform: scale(0.6667);
-                transform-origin: top left;
+                /* width/height set precisely via JS in pixels, not percentages
+                   or transform, so the float's reserved space always matches
+                   the photo's actual visible size */
             }
         }
     </style>
 </head>
 <body>
     <div class="wrap">
-        <p class="content">Hi, this is the personal website of Colin Maier, co-founder of <a href="https://www.ranchpressing.net" target="_blank" rel="noopener">Ranch Pressing</a>, founder of <a href="http://www.smallbusine.ss" target="_blank" rel="noopener">Small Business</a> and <a href="https://www.instagram.com/cckckkmkmm" target="_blank" rel="noopener">half-serious photographer</a>. You can contact me <a href="mailto:colinmaier.au.3itkf@passmail.net">here</a>.</p>
         <div class="photo-container">
             <img id="randomPhoto" alt="">
         </div>
+        <p class="content">Hi, this is the personal website of Colin Maier, co-founder of <a href="https://www.ranchpressing.net" target="_blank" rel="noopener">Ranch Pressing</a>, founder of <a href="http://www.smallbusine.ss" target="_blank" rel="noopener">Small Business</a> and <a href="https://www.instagram.com/cckckkmkmm" target="_blank" rel="noopener">half-serious photographer</a>. You can contact me <a href="mailto:colinmaier.au.3itkf@passmail.net">here</a>.</p>
     </div>
 
     <script>
@@ -149,9 +144,12 @@
         const photoEl = document.getElementById("randomPhoto");
         photoEl.src = base + chosen;
 
-        // On desktop, the text column width is exactly 1/3 of the photo's
-        // rendered width, and the font-size is dynamically adjusted so the
-        // text block's height always ends flush with the photo's bottom edge.
+        // On desktop, the photo is 2/3 of the window height, floated right.
+        // The wrap's total width is set so the leftover space beside the
+        // photo (where the text wraps) is in golden-ratio proportion to the
+        // photo's width. The font-size is shrunk (down to a 14px floor) to
+        // try to fit the text within the photo's height; any text that still
+        // doesn't fit naturally wraps to full width below the photo.
         function fitTextHeight(targetHeight) {
             const content = document.querySelector(".content");
             const MIN_FONT_SIZE = 14;
@@ -159,7 +157,7 @@
             content.style.fontSize = MIN_FONT_SIZE + "px";
             if (content.getBoundingClientRect().height >= targetHeight) {
                 // Even the minimum size doesn't fit within the photo's height;
-                // stay at the floor and let the page scroll instead of shrinking further.
+                // stay at the floor and let the overflow wrap below instead.
                 return;
             }
             for (let i = 0; i < 25; i++) {
@@ -177,19 +175,27 @@
 
         function syncDesktopLayout() {
             const content = document.querySelector(".content");
+            const wrap = document.querySelector(".wrap");
             const isDesktop = window.matchMedia("(min-width: 769px)").matches;
             if (!isDesktop) {
-                content.style.width = "";
                 content.style.fontSize = "";
+                wrap.style.width = "";
+                photoEl.style.width = "";
+                photoEl.style.height = "";
                 return;
             }
             if (!photoEl.naturalWidth || !photoEl.naturalHeight) {
                 return;
             }
-            const rect = photoEl.getBoundingClientRect();
             const GOLDEN_RATIO = 1.6180339887;
-            content.style.width = (rect.width / GOLDEN_RATIO) + "px";
-            fitTextHeight(rect.height);
+            const targetH = window.innerHeight * (2 / 3);
+            const targetW = targetH * (photoEl.naturalWidth / photoEl.naturalHeight);
+
+            photoEl.style.height = targetH + "px";
+            photoEl.style.width = targetW + "px";
+            wrap.style.width = (targetW * GOLDEN_RATIO) + "px";
+
+            fitTextHeight(targetH);
         }
 
         photoEl.addEventListener("load", syncDesktopLayout);
