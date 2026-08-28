@@ -146,21 +146,38 @@
         photoEl.src = base + chosen;
 
         // On desktop, the text column width is exactly 1/3 of the photo's
-        // rendered width. The photo's height fills the viewport, so its
-        // rendered width is determined purely by its own aspect ratio.
+        // rendered width, and the font-size is dynamically adjusted so the
+        // text block's height always ends flush with the photo's bottom edge.
+        function fitTextHeight(targetHeight) {
+            const content = document.querySelector(".content");
+            let lo = 4, hi = 200;
+            for (let i = 0; i < 25; i++) {
+                const mid = (lo + hi) / 2;
+                content.style.fontSize = mid + "px";
+                const h = content.getBoundingClientRect().height;
+                if (h <= targetHeight) {
+                    lo = mid;
+                } else {
+                    hi = mid;
+                }
+            }
+            content.style.fontSize = lo + "px";
+        }
+
         function syncDesktopLayout() {
             const content = document.querySelector(".content");
             const isDesktop = window.matchMedia("(min-width: 421px)").matches;
             if (!isDesktop) {
                 content.style.width = "";
+                content.style.fontSize = "";
                 return;
             }
             if (!photoEl.naturalWidth || !photoEl.naturalHeight) {
                 return;
             }
-            const photoH = window.innerHeight;
-            const photoW = (photoH * (photoEl.naturalWidth / photoEl.naturalHeight)) * 0.5;
-            content.style.width = (photoW / 3) + "px";
+            const rect = photoEl.getBoundingClientRect();
+            content.style.width = (rect.width / 3) + "px";
+            fitTextHeight(rect.height);
         }
 
         photoEl.addEventListener("load", syncDesktopLayout);
