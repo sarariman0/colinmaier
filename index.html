@@ -102,6 +102,8 @@
                 max-height: 100%;
                 object-fit: contain;
                 object-position: left top;
+                transform: scale(0.5);
+                transform-origin: top left;
             }
         }
     </style>
@@ -157,7 +159,7 @@
                 return;
             }
             const photoH = window.innerHeight;
-            const photoW = photoH * (photoEl.naturalWidth / photoEl.naturalHeight);
+            const photoW = (photoH * (photoEl.naturalWidth / photoEl.naturalHeight)) * 0.5;
             content.style.width = (photoW / 3) + "px";
         }
 
