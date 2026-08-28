@@ -89,13 +89,17 @@
             .content {
                 font-size: 18px; /* fallback; JS shrinks this down to a 14px floor as needed */
                 margin: 0 1px 1px 0;
+                width: auto; /* must be auto, not the mobile calc(100% - 2px), so it wraps around the float */
                 overflow-wrap: break-word;
                 word-break: break-word;
             }
             .photo-container {
+                display: block; /* override the mobile flex display */
+                width: auto; /* override the mobile 100% width so the float shrinks to the photo's size */
                 float: right;
                 margin-top: 0;
                 margin-left: 8px;
+                margin-bottom: 1px;
             }
             .photo-container img {
                 display: block;
