@@ -147,6 +147,8 @@
         const base = "https://raw.githubusercontent.com/sarariman0/colinmaier/refs/heads/main/photos/";
         const chosen = photos[Math.floor(Math.random() * photos.length)];
         const photoEl = document.getElementById("randomPhoto");
+        const contentEl = document.querySelector(".content");
+        const wrapEl = document.querySelector(".wrap");
         photoEl.src = base + chosen;
 
         // On desktop, the photo is 2/3 of the window height, floated right.
@@ -156,35 +158,32 @@
         // try to fit the text within the photo's height; any text that still
         // doesn't fit naturally wraps to full width below the photo.
         function fitTextHeight(targetHeight) {
-            const content = document.querySelector(".content");
             const MIN_FONT_SIZE = 14;
             let lo = MIN_FONT_SIZE, hi = 200;
-            content.style.fontSize = MIN_FONT_SIZE + "px";
-            if (content.getBoundingClientRect().height >= targetHeight) {
+            contentEl.style.fontSize = MIN_FONT_SIZE + "px";
+            if (contentEl.getBoundingClientRect().height >= targetHeight) {
                 // Even the minimum size doesn't fit within the photo's height;
                 // stay at the floor and let the overflow wrap below instead.
                 return;
             }
-            for (let i = 0; i < 25; i++) {
+            for (let i = 0; i < 12; i++) {
                 const mid = (lo + hi) / 2;
-                content.style.fontSize = mid + "px";
-                const h = content.getBoundingClientRect().height;
+                contentEl.style.fontSize = mid + "px";
+                const h = contentEl.getBoundingClientRect().height;
                 if (h <= targetHeight) {
                     lo = mid;
                 } else {
                     hi = mid;
                 }
             }
-            content.style.fontSize = lo + "px";
+            contentEl.style.fontSize = lo + "px";
         }
 
         function syncDesktopLayout() {
-            const content = document.querySelector(".content");
-            const wrap = document.querySelector(".wrap");
             const isDesktop = window.matchMedia("(min-width: 769px)").matches;
             if (!isDesktop) {
-                content.style.fontSize = "";
-                wrap.style.width = "";
+                contentEl.style.fontSize = "";
+                wrapEl.style.width = "";
                 photoEl.style.width = "";
                 photoEl.style.height = "";
                 return;
@@ -198,13 +197,18 @@
 
             photoEl.style.height = targetH + "px";
             photoEl.style.width = targetW + "px";
-            wrap.style.width = (targetW * GOLDEN_RATIO) + "px";
+            wrapEl.style.width = (targetW * GOLDEN_RATIO) + "px";
 
             fitTextHeight(targetH);
         }
 
         photoEl.addEventListener("load", syncDesktopLayout);
-        window.addEventListener("resize", syncDesktopLayout);
+
+        let resizeTimer;
+        window.addEventListener("resize", () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(syncDesktopLayout, 100);
+        });
     </script>
 </body>
 </html>
