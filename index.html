@@ -64,13 +64,12 @@
         }
 
         /*
-          ===== Desktop scaling =====
-          Reference width = the design width the mobile layout was tuned for.
-          Zoom scales the whole page (text + photo together), so desktop
-          looks like the same proportions as mobile, just bigger — rather
-          than a fixed 14px reading as small on a much bigger screen.
+          ===== Desktop layout =====
+          769px+ only. Some large phones (e.g. iPhone Pro Max) report a CSS
+          viewport width over 420px in portrait, so the breakpoint is set
+          well above any phone width to keep this strictly desktop/tablet.
         */
-        @media (min-width: 421px) {
+        @media (min-width: 769px) {
             /* Allow vertical scrolling (so pull-to-refresh works), but never
                let horizontal scrollbars appear. */
             html, body {
@@ -178,7 +177,7 @@
 
         function syncDesktopLayout() {
             const content = document.querySelector(".content");
-            const isDesktop = window.matchMedia("(min-width: 421px)").matches;
+            const isDesktop = window.matchMedia("(min-width: 769px)").matches;
             if (!isDesktop) {
                 content.style.width = "";
                 content.style.fontSize = "";
