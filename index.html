@@ -86,7 +86,7 @@
                 font-size: 18px;
                 flex: none;
                 margin: 0 1px 1px 0;
-                width: 25%; /* fallback before JS sets the exact 1/3-of-photo width */
+                width: 38%; /* fallback before JS sets the exact golden-ratio width */
                 overflow-wrap: break-word;
                 word-break: break-word;
             }
@@ -187,7 +187,8 @@
                 return;
             }
             const rect = photoEl.getBoundingClientRect();
-            content.style.width = (rect.width / 3) + "px";
+            const GOLDEN_RATIO = 1.6180339887;
+            content.style.width = (rect.width / GOLDEN_RATIO) + "px";
             fitTextHeight(rect.height);
         }
 
